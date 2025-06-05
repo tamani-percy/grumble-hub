@@ -94,4 +94,8 @@ dependencies {
     implementation("nl.dionsegijn:konfetti-compose:2.0.5")
 
     implementation("androidx.compose.animation:animation:1.8.2")
+
+    // Coil Compose GIFs
+    implementation("io.coil-kt.coil3:coil-gif:3.2.0")
+    implementation("io.coil-kt.coil3:coil-network-okhttp:3.2.0")
 }

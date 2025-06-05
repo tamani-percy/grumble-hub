@@ -1,20 +1,23 @@
-package com.example.grumblehub.fragments
+package com.example.grumblehub.base
 
 import LoginScreen
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.tween
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.grumblehub.R
-import com.example.grumblehub.features.home.HomeScreen
+import com.example.grumblehub.features.grievance.ui.GrievanceScreen
+import com.example.grumblehub.features.home.ui.HomeScreen
 import com.example.grumblehub.features.onboarding.OnboardingScreen
 import com.example.grumblehub.features.otp.OtpScreen
 import com.example.grumblehub.features.profile.ProfileScreen
 import com.example.grumblehub.features.search.SearchScreen
+import com.example.grumblehub.sharedviewmodels.GrievanceSharedViewModel
 
 enum class AppNavHost {
     Onboarding,
@@ -23,7 +26,8 @@ enum class AppNavHost {
     Otp,
     Home,
     Profile,
-    Search
+    Search,
+    Grievance
 }
 
 enum class AppNavBarDestination(
@@ -62,41 +66,31 @@ enum class AppNavBarDestination(
     }
 }
 
+enum class Destination(
+    val route: String,
+    val label: String,
+    val icon: Int,
+    val contentDescription: String
+) {
+    PERSONAL("Personal", "Personal", R.drawable.baseline_password_24, "Personal"),
+    GRUMBLERS("Grumblers", "Grumblers", R.drawable.baseline_search_24, "Grumblers"),
+}
 
+
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
 fun AppNavBarFragment(
     modifier: Modifier,
     navController: NavHostController = rememberNavController(),
     startDestination: String = AppNavHost.Onboarding.name
 ) {
+
+    val grievanceSharedViewModel = viewModel<GrievanceSharedViewModel>()
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
-        modifier = modifier,
-        enterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(300) // Reduced from 650ms
-            )
-        },
-        exitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                animationSpec = tween(300) // Reduced from 650ms
-            )
-        },
-        popEnterTransition = {
-            slideIntoContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(300) // Reduced from 650ms
-            )
-        },
-        popExitTransition = {
-            slideOutOfContainer(
-                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                animationSpec = tween(300) // Reduced from 650ms
-            )
-        }
+        modifier = modifier
     ) {
         composable(
             route = AppNavHost.Onboarding.name
@@ -119,19 +113,25 @@ fun AppNavBarFragment(
         composable(
             route = AppNavHost.Home.name
         ) {
-            HomeScreen(modifier = Modifier, navController = navController)
+            HomeScreen(modifier = Modifier, navController = navController, grievanceSharedViewModel = grievanceSharedViewModel)
         }
 
         composable(
             route = AppNavHost.Search.name
         ) {
-            SearchScreen(modifier = modifier, navController = navController)
+            SearchScreen(modifier = modifier, navController = navController, grievanceSharedViewModel = grievanceSharedViewModel)
         }
 
         composable(
             route = AppNavHost.Profile.name
         ) {
             ProfileScreen(modifier = modifier, navController = navController)
+        }
+
+        composable(
+            route = AppNavHost.Grievance.name
+        ) {
+            GrievanceScreen(modifier = modifier, navController = navController, grievanceSharedViewModel = grievanceSharedViewModel)
         }
     }
 }

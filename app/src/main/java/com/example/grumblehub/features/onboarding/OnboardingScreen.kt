@@ -41,7 +41,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.grumblehub.R
 import com.example.grumblehub.features.konfetti.KonfettiViewModel
-import com.example.grumblehub.fragments.AppNavHost
+import com.example.grumblehub.base.AppNavHost
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem

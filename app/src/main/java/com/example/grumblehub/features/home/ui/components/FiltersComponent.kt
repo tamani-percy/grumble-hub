@@ -1,4 +1,4 @@
-package com.example.grumblehub.features.home.components
+package com.example.grumblehub.features.home.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -25,43 +25,58 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun FiltersComponent() {
-    val dateOptions = listOf("12/07/2025", "13/07/2025")
-    val moodOptions = listOf("Happy", "Sad", "Angry")
-    val tagOptions = listOf("Work", "Home", "Family")
+    val dateOptions = remember { listOf("All", "12/07/2025", "13/07/2025") }
+    val moodOptions = remember { listOf("All", "Happy", "Sad", "Angry") }
+    val tagOptions = remember { listOf("All", "Work", "Home", "Family") }
+
     Column(
         modifier = Modifier
-            .fillMaxWidth().padding(horizontal = 20.dp),
+            .fillMaxWidth()
+            .padding(horizontal = 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth(), // Add some padding for better aesthetics
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Each Dropdown is wrapped in a Column with weight(1f)
             Column(modifier = Modifier.weight(1f)) {
-                Dropdown(label = "Date", options = dateOptions)
+                Dropdown(label = "Date", options = dateOptions, defaultSelection = "All")
             }
             Column(modifier = Modifier.weight(1f)) {
-                Dropdown(label = "Mood", options = moodOptions)
+                Dropdown(label = "Mood", options = moodOptions, defaultSelection = "All")
             }
             Column(modifier = Modifier.weight(1f)) {
-                Dropdown(label = "Tags", options = tagOptions)
+                Dropdown(label = "Tags", options = tagOptions, defaultSelection = "All")
             }
         }
     }
 }
 
+// Optimized Dropdown with stable keys
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Dropdown(
     label: String,
     options: List<String>,
+    defaultSelection: String? = null
 ) {
-    var expanded by remember { mutableStateOf(false) }
-    var selectedOption by remember { mutableStateOf(options[0]) }
+    // Create a stable key for this dropdown instance
+    val dropdownKey = remember { "$label-dropdown" }
+    var expanded by remember(dropdownKey) { mutableStateOf(false) }
+    var selectedOption by remember(dropdownKey, options, defaultSelection) {
+        mutableStateOf(
+            when {
+                defaultSelection != null && options.contains(defaultSelection) -> defaultSelection
+                options.isNotEmpty() -> options.first()
+                else -> ""
+            }
+        )
+    }
 
-    ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = !expanded }) {
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = !expanded }
+    ) {
         OutlinedTextField(
             label = { Text(label) },
             textStyle = TextStyle(
@@ -75,10 +90,15 @@ fun Dropdown(
             value = selectedOption,
             onValueChange = {},
             readOnly = true,
-            trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+            trailingIcon = {
+                ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded)
+            },
         )
-        ExposedDropdownMenu(expanded = expanded, onDismissRequest = { expanded = false }) {
-            options.forEach { option ->
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEachIndexed { _, option ->
                 DropdownMenuItem(
                     text = {
                         Text(

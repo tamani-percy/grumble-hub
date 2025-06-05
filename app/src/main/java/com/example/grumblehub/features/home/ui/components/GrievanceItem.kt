@@ -1,7 +1,5 @@
-package com.example.grumblehub.features.home.components
+package com.example.grumblehub.features.home.ui.components
 
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -17,39 +15,34 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
 import coil3.compose.AsyncImage
-import coil3.compose.LocalPlatformContext
-import coil3.compose.rememberAsyncImagePainter
-import coil3.compose.rememberConstraintsSizeResolver
 import coil3.request.ImageRequest
 import coil3.request.crossfade
 import com.example.grumblehub.R
-import com.example.grumblehub.fragments.AppNavHost
+import com.example.grumblehub.features.grievance.data.Grievance
 
 @Composable
 fun GrievanceItem(
     modifier: Modifier = Modifier,
     image: Int,
-    text: String,
-    navController: NavController
+    grievance: Grievance
 ) {
-    val sizeResolver = rememberConstraintsSizeResolver()
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { navController.navigate(AppNavHost.Search.name) }
             .padding(
                 horizontal = 20.dp,
-                vertical = 5.dp
+                vertical = 10.dp
             ) // Padding inside clickable for content spacing
-            .height(140.dp),
+            .height(170.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
@@ -57,27 +50,31 @@ fun GrievanceItem(
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = "Project Deadline Missed",
+                text = grievance.dateCreated.toString(),
+                color = Color.Gray,
+                maxLines = 3,
+                style = MaterialTheme.typography.bodySmall
+            )
+            Text(
+                text = grievance.title,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold
             )
             Text(
-                text = "Missed the deadline for the quarterly report due to unforeseen technical issues.",
+                text = grievance.grievance,
+                overflow = TextOverflow.Ellipsis,
+                softWrap = true,
                 maxLines = 3,
                 style = MaterialTheme.typography.bodyMedium
             )
             FlowRow(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                for (i in 0 until 2) {
-                    GrievanceChip(
-                        modifier = Modifier.padding(end = 4.dp),
-                        text = when (i) {
-                            0 -> "Work"
-                            1 -> "Relationship"
-                            else -> "Other"
-                        }
-                    )
-                }
+                GrievanceChip(
+                    modifier = Modifier.padding(end = 4.dp),
+                    text = grievance.tag.tag
+                )
+
             }
+
         }
         Column(
             modifier = Modifier
@@ -87,6 +84,7 @@ fun GrievanceItem(
         ) {
 
             AsyncImage(
+                filterQuality = FilterQuality.None,
                 model = ImageRequest.Builder(LocalContext.current)
                     .data(image)
                     .crossfade(true)

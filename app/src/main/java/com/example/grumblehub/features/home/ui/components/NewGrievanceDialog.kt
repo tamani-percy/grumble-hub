@@ -1,4 +1,4 @@
-package com.example.grumblehub.features.home.components
+package com.example.grumblehub.features.home.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,6 +15,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -36,6 +37,7 @@ fun NewGrievanceDialog(
     onConfirm: (String) -> Unit // Now accepts the grievance text
 ) {
     var grievanceText by remember { mutableStateOf("") }
+    var grievanceTitle by remember { mutableStateOf("") }
     val moodChipItems = remember {
         listOf(
             ChipItem(1, "Happy"),
@@ -67,9 +69,31 @@ fun NewGrievanceDialog(
                 Text(
                     text = "New Grievance",
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 8.dp)
                 )
 
+                HorizontalDivider(modifier = Modifier.padding(vertical = 10.dp))
+
+                Text(
+                    text = "Title",
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                OutlinedTextField(
+                    value = grievanceTitle,
+                    maxLines = 1,
+                    onValueChange = { grievanceTitle = it },
+                    label = { Text("Enter a title") },
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Start),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+
+                Text(
+                    text = "Grievance",
+                    style = MaterialTheme.typography.titleMedium,
+                )
                 OutlinedTextField(
                     value = grievanceText,
                     onValueChange = { grievanceText = it },
@@ -85,7 +109,6 @@ fun NewGrievanceDialog(
                 Text(
                     text = "Mood",
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
                 )
                 SingleSelectionChipGroup(
                     chips = moodChipItems,
@@ -98,7 +121,6 @@ fun NewGrievanceDialog(
                 Text(
                     text = "Tags",
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(bottom = 8.dp)
                 )
                 SingleSelectionChipGroup(
                     chips = tagChipItems,
@@ -118,7 +140,7 @@ fun NewGrievanceDialog(
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
                         onClick = { onConfirm(grievanceText) },
-                        enabled = grievanceText.isNotBlank() && selectedMoodId != null && selectedTagId != null,
+                        enabled = grievanceText.isNotBlank() && selectedMoodId != null && selectedTagId != null && grievanceTitle.isNotBlank(),
                     ) {
                         Text("Submit")
                     }
