@@ -64,6 +64,7 @@ dependencies {
 
     //Coil Compose
     implementation("io.coil-kt.coil3:coil-compose:3.2.0")
+    implementation("io.coil-kt.coil3:coil-gif:3.2.0")
 
     // Navigation
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose")
@@ -94,4 +95,5 @@ dependencies {
     implementation("nl.dionsegijn:konfetti-compose:2.0.5")
 
     implementation("androidx.compose.animation:animation:1.8.2")
+
 }

@@ -109,7 +109,7 @@ fun GrievanceScreen(
                         AsyncImage(
                             filterQuality = FilterQuality.None,
                             model = ImageRequest.Builder(LocalContext.current)
-                                .data("").crossfade(true).build(),
+                                .data(R.drawable.sad).crossfade(true).build(),
                             placeholder = painterResource(R.drawable.ic_launcher_background),
                             contentScale = ContentScale.Crop,
                             contentDescription = "Mood Image",

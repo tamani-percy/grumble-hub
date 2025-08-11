@@ -35,12 +35,15 @@ fun GrievanceItem(
     image: Int,
     text: String,
     navController: NavController,
-    onClick:() -> Unit
+    onClick: () -> Unit
 ) {
     val sizeResolver = rememberConstraintsSizeResolver()
     Row(
         modifier = modifier
             .fillMaxWidth()
+            .clickable {
+                onClick()
+            }
             .padding(
                 horizontal = 20.dp,
                 vertical = 5.dp
