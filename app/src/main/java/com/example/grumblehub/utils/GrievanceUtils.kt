@@ -1,10 +1,10 @@
 package com.example.grumblehub.utils
 
 import com.example.grumblehub.R
-import com.example.grumblehub.features.grievance.data.Mood
-import com.example.grumblehub.features.grievance.data.Tag
+import com.example.grumblehub.features.grievance.data.MoodResponse
+import com.example.grumblehub.features.grievance.data.TagResponse
 
-fun grievanceImage(tag: Tag): Int = when (tag.tag) {
+fun grievanceImage(tag: TagResponse): Int = when (tag.name) {
     "Work" -> R.drawable.work
     "Relationship" -> R.drawable.relationship
     "Home" -> R.drawable.home
@@ -12,7 +12,7 @@ fun grievanceImage(tag: Tag): Int = when (tag.tag) {
     else -> R.drawable.work
 }
 
-fun grievanceMoodGifs(mood: Mood): Int = when (mood.mood) {
+fun grievanceMoodGifs(mood: MoodResponse): Int = when (mood.name) {
     "Happy" -> R.drawable.happy
     "Upset" -> R.drawable.upset
     "Disgust" -> R.drawable.disgust

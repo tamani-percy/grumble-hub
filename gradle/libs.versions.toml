@@ -1,7 +1,7 @@
 [versions]
 agp = "8.8.2"
 animation = "1.8.2"
-kotlin = "2.0.0"
+kotlin = "2.1.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
 junitVersion = "1.2.1"
@@ -22,6 +22,7 @@ androidx-material = { module = "androidx.compose.material:material", version.ref
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref="lifecycleRuntimeKtx"}
 androidx-navigation-fragment = { module = "androidx.navigation:navigation-fragment", version.ref="lifecycleRuntimeKtx"}
 androidx-navigation-ui = { module = "androidx.navigation:navigation-ui", version.ref="lifecycleRuntimeKtx"}
+insert-koin-koin-core = { module = "io.insert-koin:koin-core" }
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }

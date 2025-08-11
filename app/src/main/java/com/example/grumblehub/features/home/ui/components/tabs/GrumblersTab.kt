@@ -11,11 +11,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -24,8 +27,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.grumblehub.features.grievance.data.Grievance
+import com.example.grumblehub.features.grievance.data.GroupGrievanceResponse
 import com.example.grumblehub.features.home.ui.components.FiltersComponent
-import com.example.grumblehub.features.home.ui.components.GrievanceItem
+import com.example.grumblehub.features.home.ui.components.GroupGrievanceItem
 import com.example.grumblehub.sharedviewmodels.GrievanceSharedViewModel
 import com.example.grumblehub.utils.grievanceImage
 
@@ -33,12 +37,11 @@ import com.example.grumblehub.utils.grievanceImage
 @Composable
 fun GrumblersTab(
     isSelected: Boolean,
-    data: List<Grievance>,
-    isScrollingState: LazyListState,
+    grievances: List<Grievance>,
+    listState: LazyListState,
     grievanceSharedViewModel: GrievanceSharedViewModel,
     navController: NavController
 ) {
-    val listState = rememberLazyListState()
     var isScrollingDown by remember { mutableStateOf(false) }
 
     LaunchedEffect(listState) {
@@ -58,34 +61,78 @@ fun GrumblersTab(
             previousScrollOffset = offset
         }
     }
-    if (isSelected && data != null) {
+
+    if (isSelected) {
         Column(modifier = Modifier.background(MaterialTheme.colorScheme.onPrimaryContainer)) {
             Spacer(modifier = Modifier.height(15.dp))
             FiltersComponent()
             Spacer(modifier = Modifier.height(15.dp))
 
             LazyColumn(
-                state = isScrollingState,
+                state = listState,
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f),
             ) {
                 items(
-                    items = data,
-                    key = { grievance -> grievance.id }
+                    items = grievances,
+                    key = { grievance -> grievance}
                 ) { grievance ->
-                    GrievanceItem(
+                    GroupGrievanceItem(
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
                                 grievanceSharedViewModel.selectedGrievance = grievance
-
                             },
                         grievance = grievance,
                         image = grievanceImage(grievance.tag)
                     )
                 }
             }
+        }
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.O)
+@Composable
+fun GrievanceTabs(
+    isLoading: Boolean,
+    isSelected: Boolean,
+    groupGrievances: List<GroupGrievanceResponse>,
+    grievanceSharedViewModel: GrievanceSharedViewModel,
+    navController: NavController
+) {
+    val tabs = remember(groupGrievances) {
+        groupGrievances
+            .groupBy { it.userResponse }
+            .entries
+            .map { (user, responses) ->
+                user to responses.flatMap { it.grievanceResponse }
+            }
+    }
+
+    var selectedTabIndex by remember { mutableIntStateOf(0) }
+    val tabListStates = remember { tabs.map { LazyListState() } }
+
+    Column {
+        TabRow(selectedTabIndex = selectedTabIndex) {
+            tabs.forEachIndexed { index, (user, _) ->
+                Tab(
+                    selected = selectedTabIndex == index,
+                    onClick = { selectedTabIndex = index },
+                    text = { Text(user.email) }
+                )
+            }
+        }
+
+        tabs.forEachIndexed { index, (user, grievances) ->
+            GrumblersTab(
+                isSelected = isSelected,
+                grievances = grievances,
+                listState = tabListStates[index],
+                grievanceSharedViewModel = grievanceSharedViewModel,
+                navController = navController
+            )
         }
     }
 }

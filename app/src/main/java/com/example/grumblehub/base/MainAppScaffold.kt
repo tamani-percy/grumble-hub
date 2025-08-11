@@ -1,13 +1,20 @@
 package com.example.grumblehub.base
 
+import LoginScreen
+import SignupScreen
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Badge
 import androidx.compose.material3.BadgedBox
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
+import androidx.compose.material3.LoadingIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarDefaults
@@ -15,136 +22,68 @@ import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.NavHostController
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.grumblehub.core.datastore.DataStoreManager
+import com.example.grumblehub.features.home.ui.HomeScreen
+import com.example.grumblehub.features.login.data.AuthState
+import com.example.grumblehub.features.login.ui.LoginOtpScreen
+import com.example.grumblehub.features.onboarding.OnboardingScreen
+import com.example.grumblehub.features.profile.ProfileScreen
+import com.example.grumblehub.features.search.SearchScreen
+import com.example.grumblehub.features.signup.ui.NewPasswordScreen
+import com.example.grumblehub.features.signup.ui.SignupOtpScreen
 
+@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainAppScaffold() {
+fun AppEntryPoint(modifier: Modifier, dataStoreManager: DataStoreManager) {
+    var authState by remember { mutableStateOf<AuthState>(AuthState.Loading) }
     val navController = rememberNavController()
-    val currentBackStackEntry by navController.currentBackStackEntryAsState()
-    val currentDestinationRoute = currentBackStackEntry?.destination?.route
 
-    val bottomBarRoutes = remember {
-        setOf(
-            AppNavHost.Home.name,
-            AppNavHost.Profile.name,
-            AppNavHost.Search.name
-        )
+    LaunchedEffect(Unit) {
+        authState = if (dataStoreManager.isUserAuthenticated()) {
+            AuthState.Authenticated
+        } else {
+            AuthState.Unauthenticated
+        }
     }
 
-    val showBottomBar = currentDestinationRoute in bottomBarRoutes
-
-    val selectedDestination = AppNavBarDestination.Companion.entries.indexOfFirst {
-        it.route == currentDestinationRoute
-    }.takeIf { it >= 0 } ?: 0
-
-
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        bottomBar = {
-            if (showBottomBar) {
-                OptimizedNavigationBar(
-                    navController = navController,
-                    currentRoute = currentDestinationRoute,
-                    selectedDestination = selectedDestination
-                )
+    when (authState) {
+        AuthState.Loading -> {
+            Column(
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier.fillMaxSize()
+            ) {
+                LoadingIndicator()
             }
         }
-    ) { contentPadding ->
-        AppNavBarFragment(
-            modifier = Modifier.padding(contentPadding),
-            navController = navController,
-            startDestination = AppNavHost.Profile.name
-        )
-    }
-}
 
-@Composable
-private fun OptimizedNavigationBar(
-    navController: NavHostController,
-    currentRoute: String?,
-    selectedDestination: Int
-) {
-    NavigationBar(
-        windowInsets = NavigationBarDefaults.windowInsets,
-    ) {
-        AppNavBarDestination.Companion.entries.forEach { destination ->
-            val selected = currentRoute == destination.route
-
-            NavigationBarItem(
-                selected = selected,
-                onClick = {
-                    val current = navController.currentDestination?.route
-                    if (current != destination.route) {
-                        navController.navigate(destination.route) {
-                            popUpTo(navController.graph.findStartDestination().id) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
-                            restoreState = true
-                        }
-                    }
-                },
-                icon = {
-                    NavigationIcon(destination = destination, selected = selected)
-                },
-                label = {
-                    NavigationLabel(destination = destination, selected = selected)
-                },
+        AuthState.Authenticated, AuthState.Unauthenticated -> {
+            // Use single app with conditional bottom bar
+            AppWithConditionalBottomBar(
+                navController = navController,
+                authState = authState,
+                dataStoreManager = dataStoreManager,
+                onAuthStateChange = { newState -> authState = newState }
             )
         }
     }
 }
 
-@Composable
-private fun NavigationIcon(
-    destination: AppNavBarDestination,
-    selected: Boolean
-) {
-    val tint by animateColorAsState(
-        targetValue = if (selected) {
-            MaterialTheme.colorScheme.onPrimary
-        } else {
-            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-        },
-        label = "iconColor"
-    )
-
-    BadgedBox(
-        badge = {
-            if (destination.shouldShowBadge) {
-                Badge { Text("3") }
-            }
-        }
-    ) {
-        Icon(
-            painter = painterResource(destination.iconResId),
-            contentDescription = destination.contentDescription,
-            tint = tint
-        )
-    }
-}
-
-@Composable
-private fun NavigationLabel(
-    destination: AppNavBarDestination,
-    selected: Boolean
-) {
-    Text(
-        text = destination.label,
-        style = MaterialTheme.typography.labelSmall.copy(
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Normal,
-            fontSize = 14.sp
-        )
-    )
-}
 

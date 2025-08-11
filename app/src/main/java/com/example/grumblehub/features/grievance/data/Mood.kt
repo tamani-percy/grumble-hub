@@ -1,0 +1,11 @@
+package com.example.grumblehub.features.grievance.data
+
+import com.google.gson.annotations.SerializedName
+
+
+data class MoodResponse(
+    @SerializedName("id") val id: Long,
+    @SerializedName("name") val name: String,
+    @SerializedName("createdAt") val createdAt: String,
+)
+

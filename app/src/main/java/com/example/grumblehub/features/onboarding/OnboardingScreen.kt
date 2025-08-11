@@ -20,6 +20,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -27,6 +28,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -42,6 +44,8 @@ import androidx.navigation.NavHostController
 import com.example.grumblehub.R
 import com.example.grumblehub.features.konfetti.KonfettiViewModel
 import com.example.grumblehub.base.AppNavHost
+import com.example.grumblehub.core.datastore.DataStoreManager
+import kotlinx.coroutines.launch
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
 import nl.dionsegijn.konfetti.core.PartySystem
@@ -49,7 +53,7 @@ import nl.dionsegijn.konfetti.xml.image.ImageUtil
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OnboardingScreen(modifier: Modifier, navController: NavHostController) {
+fun OnboardingScreen(modifier: Modifier, navController: NavHostController, dataStoreManager: DataStoreManager, onLoginSuccess: () -> Unit) {
     // ViewModel for Konfetti
     val viewModel = viewModel<KonfettiViewModel>()
     val state: KonfettiViewModel.State by viewModel.state.observeAsState(
@@ -61,7 +65,7 @@ fun OnboardingScreen(modifier: Modifier, navController: NavHostController) {
 
     // Dropdown Menu
     var expanded by remember { mutableStateOf(false) }
-
+    val scope = rememberCoroutineScope()
     // Show Konfetti when the screen is launched
     LaunchedEffect(Unit) {
         if (!hasShownKonfetti.value && drawable != null) {
@@ -70,92 +74,106 @@ fun OnboardingScreen(modifier: Modifier, navController: NavHostController) {
         }
     }
 
-    Box(
-        modifier = Modifier
-            .padding(16.dp)
-    ) {
-        IconButton(onClick = { expanded = !expanded }) {
-            Icon(
-                painter = painterResource(R.drawable.baseline_more_vert_24),
-                contentDescription = "More options"
-            )
-        }
-        DropdownMenu(
-            expanded = expanded,
-            onDismissRequest = { expanded = false }
-        ) {
-            DropdownMenuItem(
-                text = { Text("Home Screen") },
-                onClick = { navController.navigate(AppNavHost.Home.name) }
-            )
-        }
-    }
+//    Box(
+//        modifier = Modifier
+//            .padding(16.dp)
+//    ) {
+//        IconButton(onClick = { expanded = !expanded }) {
+//            Icon(
+//                painter = painterResource(R.drawable.baseline_more_vert_24),
+//                contentDescription = "More options"
+//            )
+//        }
+//        DropdownMenu(
+//            expanded = expanded,
+//            onDismissRequest = { expanded = false }
+//        ) {
+//            DropdownMenuItem(
+//                text = { Text("Home Screen") },
+//                onClick = { navController.navigate(AppNavHost.Home.name) }
+//            )
+//        }
+//    }
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Image(
-                painter = painterResource(R.drawable.grumble_hub),
-                contentDescription = "Grumble Hub Logo"
-            )
-            Text(
-                text = "Your one-stop destination to relieve that kandolo in your throat.",
-                textAlign = TextAlign.Center,
-                modifier = Modifier.padding(horizontal = 15.dp)
-            )
+    Scaffold {
+        innerPadding ->
+        Column (modifier = Modifier.padding(innerPadding)) {
+            Box(modifier = Modifier.fillMaxSize()) {
+                Column(
+                    modifier = modifier.fillMaxSize(),
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
 
-            RoundedImageWithColoredShadow(
-                imageResourceId = R.drawable.booboo
-            )
+                        Image(
+                            painter = painterResource(R.drawable.grumble_hub),
+                            contentDescription = "Grumble Hub Logo"
+                        )
+                        Text(
+                            text = "Your one-stop destination to relieve that kandolo in your throat.",
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.padding(horizontal = 15.dp)
+                        )
 
-            Button(
-                onClick = {
-                    navController.navigate(AppNavHost.Signup.name)
-                }) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_person_24),
-                    contentDescription = "Arrow Forward Icon",
-                    modifier = Modifier.width(24.dp)
-                )
-                Text(text = "Sign up", fontSize = MaterialTheme.typography.titleLarge.fontSize)
-
-            }
-            Spacer(modifier = Modifier.height(10.dp))
-            Button(
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.secondary,
-
-                    contentColor = MaterialTheme.colorScheme.onSecondary
-                ),
-                onClick = {
-                    navController.navigate(AppNavHost.Login.name)
-                }) {
-                Icon(
-                    painter = painterResource(R.drawable.baseline_arrow_right_alt_24),
-                    contentDescription = "Arrow Forward Icon",
-                    modifier = Modifier.width(24.dp)
-                )
-                Text(text = "Log in", fontSize = MaterialTheme.typography.titleLarge.fontSize)
-
-            }
-        }
-
-        if (state is KonfettiViewModel.State.Started) {
-            KonfettiView(
-                modifier = Modifier.fillMaxSize(),
-                parties = (state as KonfettiViewModel.State.Started).party,
-                updateListener = object : OnParticleSystemUpdateListener {
-                    override fun onParticleSystemEnded(
-                        system: PartySystem,
-                        activeSystems: Int,
-                    ) {
-                        if (activeSystems == 0) viewModel.ended()
+                        RoundedImageWithColoredShadow(
+                            imageResourceId = R.drawable.booboo
+                        )
                     }
+
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.primary,
+                            ),
+                            onClick = {
+                                navController.navigate(AppNavHost.Signup.name)
+                            }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_person_24),
+                                contentDescription = "Arrow Forward Icon",
+                                modifier = Modifier.width(24.dp)
+                            )
+                            Text(text = "Sign up", fontSize = MaterialTheme.typography.titleLarge.fontSize)
+
+                        }
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Button(
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = MaterialTheme.colorScheme.tertiary,
+                            ),
+                            onClick = {
+                                navController.navigate(AppNavHost.Login.name)
+                            }) {
+                            Icon(
+                                painter = painterResource(R.drawable.baseline_arrow_right_alt_24),
+                                contentDescription = "Arrow Forward Icon",
+                                modifier = Modifier.width(24.dp)
+                            )
+                            Text(text = "Log in", fontSize = MaterialTheme.typography.titleLarge.fontSize)
+
+                        }
+                        Spacer(modifier = Modifier.height(40.dp))
+
+                    }
+
                 }
-            )
+
+                if (state is KonfettiViewModel.State.Started) {
+                    KonfettiView(
+                        modifier = Modifier.fillMaxSize(),
+                        parties = (state as KonfettiViewModel.State.Started).party,
+                        updateListener = object : OnParticleSystemUpdateListener {
+                            override fun onParticleSystemEnded(
+                                system: PartySystem,
+                                activeSystems: Int,
+                            ) {
+                                if (activeSystems == 0) viewModel.ended()
+                            }
+                        }
+                    )
+                }
+            }
         }
     }
 }
@@ -169,8 +187,8 @@ fun RoundedImageWithColoredShadow(
     Box(
         modifier = modifier
             .padding(20.dp)
-            .clip(RoundedCornerShape(100.dp))
-            .size(150.dp)
+            .clip(RoundedCornerShape(300.dp))
+            .size(300.dp)
     ) {
         Image(
             painter = painterResource(id = imageResourceId),

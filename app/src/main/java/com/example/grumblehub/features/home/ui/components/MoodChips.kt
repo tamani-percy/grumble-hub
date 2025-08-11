@@ -15,13 +15,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.grumblehub.R
 
-data class ChipItem(val id: Int, val label: String)
+data class ChipItem(val id: Long, val name: String, val createdAt: String)
 
 @Composable
 fun SingleSelectionChipGroup(
     chips: List<ChipItem>,
-    selectedChipId: Int?, // This is the single source of truth for selection
-    onChipSelected: (Int) -> Unit
+    selectedChipId: Long?, // This is the single source of truth for selection
+    onChipSelected: (Long) -> Unit
 ) {
     FlowRow(
         modifier = Modifier.fillMaxWidth(),
@@ -31,7 +31,7 @@ fun SingleSelectionChipGroup(
             FilterChip(
                 selected = chip.id == selectedChipId, // Check if this chip is currently selected
                 onClick = { onChipSelected(chip.id) }, // Trigger the callback with the selected chip's ID
-                label = { Text(chip.label) },
+                label = { Text(chip.name) },
                 // Modifier.weight(1f) was removed in the previous fix to allow natural sizing
                 // No weight modifier is needed here for FlowRow to behave correctly
                 leadingIcon = {
