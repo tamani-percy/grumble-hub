@@ -29,6 +29,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.grumblehub.R
+import com.example.grumblehub.core.AppNavHost
 import com.example.grumblehub.features.home.components.FiltersComponent
 import com.example.grumblehub.features.home.components.GrievanceItem
 import com.example.grumblehub.features.home.components.NewGrievanceDialog
@@ -42,8 +43,10 @@ fun HomeScreen(modifier: Modifier, navController: NavController) {
     var showDialog by remember { mutableStateOf(false) } // State to control dialog visibility
     val results = listOf<String>()
     val allItems = remember {
-        listOf("Apple", "Banana", "Cherry",  "Elderberry",
-            "Fig", "Grape", "Honeydew", "Jackfruit", "Kiwi")
+        listOf(
+            "Apple", "Banana", "Cherry", "Elderberry",
+            "Fig", "Grape", "Honeydew", "Jackfruit", "Kiwi"
+        )
     }
 
     val images = remember {
@@ -83,13 +86,16 @@ fun HomeScreen(modifier: Modifier, navController: NavController) {
                 ) {
                     itemsIndexed(
                         items = results.ifEmpty { allItems },
-                        key = { index, item -> item }) { index, item ->
+                        key = { _, item -> item }) { index, _ ->
                         GrievanceItem(
                             modifier = Modifier
                                 .fillMaxWidth(),
                             image = images.getOrElse(index % images.size) { R.drawable.ic_launcher_foreground },
                             text = "Work",
-                            navController = navController
+                            navController = navController,
+                            onClick = {
+                                navController.navigate(AppNavHost.Grievance.name)
+                            }
                         )
                         HorizontalDivider(
                             thickness = 1.dp,
@@ -98,7 +104,6 @@ fun HomeScreen(modifier: Modifier, navController: NavController) {
                     }
                 }
             }
-            // Conditionally show the dialog based on showDialog state
             if (showDialog) {
                 NewGrievanceDialog(
                     onDismissRequest = { showDialog = false }, // Dismiss dialog

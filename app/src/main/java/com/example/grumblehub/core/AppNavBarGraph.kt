@@ -1,6 +1,8 @@
-package com.example.grumblehub.fragments
+package com.example.grumblehub.core
 
 import LoginScreen
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
@@ -10,6 +12,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.grumblehub.R
+import com.example.grumblehub.features.grievance.ui.GrievanceScreen
 import com.example.grumblehub.features.home.HomeScreen
 import com.example.grumblehub.features.onboarding.OnboardingScreen
 import com.example.grumblehub.features.otp.OtpScreen
@@ -23,6 +26,7 @@ enum class AppNavHost {
     Otp,
     Home,
     Profile,
+    Grievance,
     Search
 }
 
@@ -63,8 +67,9 @@ enum class AppNavBarDestination(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun AppNavBarFragment(
+fun AppNavBarGraph(
     modifier: Modifier,
     navController: NavHostController = rememberNavController(),
     startDestination: String = AppNavHost.Onboarding.name
@@ -133,5 +138,11 @@ fun AppNavBarFragment(
         ) {
             ProfileScreen(modifier = modifier, navController = navController)
         }
+        composable(
+            route = AppNavHost.Grievance.name
+        ) {
+            GrievanceScreen(modifier = modifier, navController = navController)
+        }
+
     }
 }

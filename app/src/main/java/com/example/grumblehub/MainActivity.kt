@@ -10,7 +10,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.compose.GrumbleHubTheme
-import com.example.grumblehub.fragments.MainAppScaffold
+import com.example.grumblehub.core.MainAppScaffold
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
