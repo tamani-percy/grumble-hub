@@ -13,7 +13,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.grumblehub.R
 import com.example.grumblehub.features.grievance.ui.GrievanceScreen
-import com.example.grumblehub.features.home.HomeScreen
+import com.example.grumblehub.features.home.ui.HomeScreen
 import com.example.grumblehub.features.onboarding.OnboardingScreen
 import com.example.grumblehub.features.otp.OtpScreen
 import com.example.grumblehub.features.profile.ProfileScreen

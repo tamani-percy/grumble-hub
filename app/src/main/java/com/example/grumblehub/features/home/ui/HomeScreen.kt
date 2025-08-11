@@ -1,4 +1,4 @@
-package com.example.grumblehub.features.home
+package com.example.grumblehub.features.home.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -30,17 +30,21 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.grumblehub.R
 import com.example.grumblehub.core.AppNavHost
-import com.example.grumblehub.features.home.components.FiltersComponent
-import com.example.grumblehub.features.home.components.GrievanceItem
-import com.example.grumblehub.features.home.components.NewGrievanceDialog
-import com.example.grumblehub.features.home.components.NewGrievanceFAB
-import com.example.grumblehub.features.home.components.TopBarComponent
+import com.example.grumblehub.features.home.ui.components.FiltersComponent
+import com.example.grumblehub.features.home.ui.components.GrievanceItem
+import com.example.grumblehub.features.home.ui.components.NewGrievanceDialog
+import com.example.grumblehub.features.home.ui.components.NewGrievanceFAB
+import com.example.grumblehub.features.home.ui.components.StepData
+import com.example.grumblehub.features.home.ui.components.StepperDialog
+import com.example.grumblehub.features.home.ui.components.TopBarComponent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(modifier: Modifier, navController: NavController) {
+
+    var showStepperDialog by remember { mutableStateOf(true) }
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-    var showDialog by remember { mutableStateOf(false) } // State to control dialog visibility
+    var showGrievanceDialog by remember { mutableStateOf(false) } // State to control dialog visibility
     val results = listOf<String>()
     val allItems = remember {
         listOf(
@@ -53,16 +57,39 @@ fun HomeScreen(modifier: Modifier, navController: NavController) {
         listOf(R.drawable.work, R.drawable.relationship, R.drawable.social)
     }
 
+    if (showStepperDialog) {
+        StepperDialog(
+            steps = listOf(
+                StepData(
+                    title = "Welcome",
+                    description = "This is the first step of your onboarding.",
+                    gifUrl = R.drawable.sad
+                ),
+                StepData(
+                    title = "Second Step",
+                    description = "Here's some more information.",
+                    gifUrl = R.drawable.happy
+                ),
+                StepData(
+                    title = "All Done!",
+                    description = "You're ready to start using the app.",
+                    gifUrl = R.drawable.shush
+                )
+            ),
+            onDismiss = { showStepperDialog = false }
+        )
+    }
+
 
     Scaffold(
         contentWindowInsets = WindowInsets(0),
         topBar = { TopBarComponent() },
         floatingActionButton = {
-            // Pass the lambda to update showDialog when FAB is clicked
+            // Pass the lambda to update showGrievanceDialog when FAB is clicked
             Row(horizontalArrangement = Arrangement.End) {
                 NewGrievanceFAB(
                     modifier = Modifier.fillMaxWidth(),
-                    onShowDialog = { showDialog = true })
+                    onShowDialog = { showGrievanceDialog = true })
             }
         },
         modifier = Modifier
@@ -104,15 +131,17 @@ fun HomeScreen(modifier: Modifier, navController: NavController) {
                     }
                 }
             }
-            if (showDialog) {
+            if (showGrievanceDialog) {
                 NewGrievanceDialog(
-                    onDismissRequest = { showDialog = false }, // Dismiss dialog
+                    onDismissRequest = { showGrievanceDialog = false }, // Dismiss dialog
                     onConfirm = {
-                        showDialog = false // Dismiss dialog after confirmation
+                        showGrievanceDialog = false // Dismiss dialog after confirmation
                     }
                 )
             }
         }
     }
 }
+
+
 

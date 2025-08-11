@@ -54,6 +54,7 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.runtime.livedata)
     implementation(libs.androidx.appcompat.resources)
+    implementation(libs.androidx.room.runtime.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -95,5 +96,15 @@ dependencies {
     implementation("nl.dionsegijn:konfetti-compose:2.0.5")
 
     implementation("androidx.compose.animation:animation:1.8.2")
+
+    // Koin
+    implementation("io.insert-koin:koin-core:3.5.3")
+
+    // Android Support
+    implementation("io.insert-koin:koin-android:3.5.3")
+
+    // Optional: Jetpack Compose
+    implementation("io.insert-koin:koin-androidx-compose:3.5.3")
+    implementation("io.insert-koin:koin-androidx-compose-navigation:3.5.3")
 
 }

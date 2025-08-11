@@ -1,4 +1,4 @@
-package com.example.grumblehub.features.home.components
+package com.example.grumblehub.features.home.ui.components
 
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
