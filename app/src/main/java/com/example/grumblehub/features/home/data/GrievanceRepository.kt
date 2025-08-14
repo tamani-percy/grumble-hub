@@ -11,14 +11,22 @@ class GrievanceRepository(
         return grievanceDao.getAllGrievances()
     }
 
-    suspend fun addGrievance(grievance: GrievanceEntity): Result<GrievanceEntity> {
+    suspend fun createGrievance(grievance: GrievanceDto): Result<GrievanceEntity> {
         return try {
-            grievanceDao.insertGrievance(grievance)
-            Result.success(grievance)
+            val grievanceEntity = GrievanceEntity(
+                grievanceId = grievance.grievanceId ?: 0,
+                title = grievance.title,
+                grievance = grievance.grievance,
+                moodId = grievance.moodId,
+                tagId = grievance.tagId,
+                createdAt = grievance.createdAt,
+                updatedAt = grievance.updatedAt
+            )
+            grievanceDao.insertGrievance(grievanceEntity)
+            Result.success(grievanceEntity)
         } catch (e: Exception) {
             Result.failure(e)
         }
-
     }
 
     suspend fun deleteGrievance(grievance: GrievanceEntity) {

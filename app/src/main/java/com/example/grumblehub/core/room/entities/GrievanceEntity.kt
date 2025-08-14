@@ -25,12 +25,11 @@ import androidx.room.PrimaryKey
 )
 data class GrievanceEntity(
     @PrimaryKey(autoGenerate = true)
-    val grievanceId: String,
+    val grievanceId: Long,
     val title: String,
     val grievance: String,
     val moodId: Long,
     val tagId: Long,
-    val isRead: Boolean,
     val createdAt: Long = System.currentTimeMillis(),
     val updatedAt: Long? = null
 )

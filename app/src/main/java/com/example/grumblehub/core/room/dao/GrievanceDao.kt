@@ -13,6 +13,9 @@ interface GrievanceDao {
     suspend fun insertGrievance(grievance: GrievanceEntity)
 
     @Query("SELECT * FROM grievances WHERE grievanceId = :grievanceId")
+    suspend fun updateGrievance(grievanceId: Long): GrievanceEntity?
+
+    @Query("SELECT * FROM grievances WHERE grievanceId = :grievanceId")
     suspend fun getGrievanceById(grievanceId: Long): GrievanceEntity?
 
     @Query("SELECT * FROM grievances")

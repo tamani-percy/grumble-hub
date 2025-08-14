@@ -1,29 +1,31 @@
 package com.example.grumblehub.core
 
-import LoginScreen
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.appcompat.content.res.AppCompatResources
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.tween
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.example.grumblehub.R
+import com.example.grumblehub.core.datastore.DataStoreManager
 import com.example.grumblehub.features.grievance.ui.GrievanceScreen
 import com.example.grumblehub.features.home.ui.HomeScreen
-import com.example.grumblehub.features.onboarding.OnboardingScreen
-import com.example.grumblehub.features.otp.OtpScreen
+import com.example.grumblehub.features.konfetti.KonfettiViewModel
 import com.example.grumblehub.features.profile.ProfileScreen
 import com.example.grumblehub.features.search.SearchScreen
 
 enum class AppNavHost {
-    Onboarding,
-    Login,
-    Signup,
-    Otp,
     Home,
     Profile,
     Grievance,
@@ -72,8 +74,16 @@ enum class AppNavBarDestination(
 fun AppNavBarGraph(
     modifier: Modifier,
     navController: NavHostController = rememberNavController(),
-    startDestination: String = AppNavHost.Onboarding.name
+    startDestination: String = AppNavHost.Home.name,
+    dataStoreManager: DataStoreManager
 ) {
+    val context = LocalContext.current
+    val konfettiViewModel = viewModel<KonfettiViewModel>()
+    val konfettiState: KonfettiViewModel.State by konfettiViewModel.state.observeAsState(
+        KonfettiViewModel.State.Idle,
+    )
+    val heartDrawable = AppCompatResources.getDrawable(context, R.drawable.ic_heart)
+
     NavHost(
         navController = navController,
         startDestination = startDestination,
@@ -103,28 +113,20 @@ fun AppNavBarGraph(
             )
         }
     ) {
-        composable(
-            route = AppNavHost.Onboarding.name
-        ) {
-            OnboardingScreen(modifier = modifier, navController = navController)
-        }
 
-        composable(
-            route = AppNavHost.Login.name
-        ) {
-            LoginScreen(modifier = modifier, navController = navController)
-        }
-
-        composable(
-            route = AppNavHost.Otp.name
-        ) {
-            OtpScreen(modifier = modifier, navController = navController)
-        }
 
         composable(
             route = AppNavHost.Home.name
         ) {
-            HomeScreen(modifier = Modifier, navController = navController)
+            HomeScreen(
+                modifier = Modifier,
+                navController = navController,
+                dataStoreManager = dataStoreManager,
+                konfettiState = konfettiState,
+                context = context,
+                heartDrawable = heartDrawable,
+                konfettiViewModel = konfettiViewModel
+            )
         }
 
         composable(

@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -26,7 +27,9 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -41,16 +44,21 @@ import androidx.compose.ui.window.DialogProperties
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.example.grumblehub.core.datastore.DataStoreManager
+import kotlinx.coroutines.launch
 
 @Composable
 fun StepperDialog(
     steps: List<StepData>,
     onDismiss: () -> Unit,
+    dataStoreManager: DataStoreManager,
     startAt: Int = 0,
     dismissOnOutside: Boolean = false,
     showSkip: Boolean = false,
 ) {
     var currentStep by remember { mutableIntStateOf(startAt.coerceIn(0, steps.lastIndex)) }
+    var dontShowAgain by remember { mutableStateOf(false) }
+    val coroutine = rememberCoroutineScope()
 
     Dialog(
         onDismissRequest = onDismiss,
@@ -132,6 +140,22 @@ fun StepperDialog(
 
                 Spacer(Modifier.height(18.dp))
 
+                if (currentStep == steps.lastIndex) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(bottom = 8.dp)
+                    ) {
+                        Checkbox(
+                            checked = dontShowAgain,
+                            onCheckedChange = { dontShowAgain = it }
+                        )
+                        Text("Don't show again")
+                    }
+                }
+
+                // Navigation buttons
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
@@ -145,14 +169,21 @@ fun StepperDialog(
                     if (currentStep < steps.lastIndex) {
                         Button(onClick = { currentStep++ }) { Text("Next") }
                     } else {
-                        Button(onClick = onDismiss) { Text("Finish") }
+                        Button(onClick = {
+                            if (dontShowAgain) {
+                                coroutine.launch {
+                                    dataStoreManager.setStepper(true)
+                                }
+                            }
+                            onDismiss()
+                        }) { Text("Finish") }
                     }
                 }
             }
         }
     }
-
 }
+
 
 @Composable
 private fun StepDotsIndicator(

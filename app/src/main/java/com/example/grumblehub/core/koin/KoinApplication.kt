@@ -1,4 +1,4 @@
-package com.example.grumblehub
+package com.example.grumblehub.core.koin
 
 import android.app.Application
 import org.koin.android.ext.koin.androidContext
@@ -15,7 +15,8 @@ class KoinApplication : Application() {
             androidContext(this@KoinApplication)
             modules(
                 databaseModule,
-                viewModelModule
+                viewModelModule,
+                networkModule
             )
         }
     }

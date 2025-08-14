@@ -9,7 +9,7 @@ import com.example.grumblehub.core.room.entities.GrievanceEntity
 import com.example.grumblehub.core.room.entities.MoodEntity
 import com.example.grumblehub.core.room.entities.TagEntity
 
-@Database(entities = [GrievanceEntity::class, MoodEntity::class, TagEntity::class], version = 1)
+@Database(entities = [GrievanceEntity::class, MoodEntity::class, TagEntity::class], version = 3)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun grievanceDao(): GrievanceDao
 

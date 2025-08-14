@@ -20,6 +20,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -29,22 +30,27 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.example.grumblehub.core.room.entities.MoodEntity
 
 @Composable
 fun NewGrievanceDialog(
+    moods: List<MoodEntity>,
     onDismissRequest: () -> Unit,
-    onConfirm: (String) -> Unit // Now accepts the grievance text
+    onConfirm: (String) -> Unit
 ) {
     var grievanceText by remember { mutableStateOf("") }
-    val moodChipItems = remember {
-        listOf(
-            ChipItem(1, "Happy"),
-            ChipItem(2, "Sad"),
-            ChipItem(3, "Upset"),
-            ChipItem(4, "Disgust"),
-            ChipItem(5, "Neutral")
-        )
+    var selectedMoodId by remember { mutableStateOf<Int?>(null) }
+    var selectedTagId by remember { mutableStateOf<Int?>(null) }
+
+    val moodChipItems = remember(moods) {
+        moods.map { mood ->
+            ChipItem(
+                id = mood.moodId.toInt(),
+                label = mood.name
+            )
+        }
     }
+
     val tagChipItems = remember {
         listOf(
             ChipItem(1, "Work"),
@@ -53,8 +59,7 @@ fun NewGrievanceDialog(
             ChipItem(4, "Relationships"),
         )
     }
-    var selectedMoodId by remember { mutableStateOf<Int?>(null) }
-    var selectedTagId by remember { mutableStateOf<Int?>(null) }
+
     Dialog(onDismissRequest = { onDismissRequest() }) {
         Card(
             modifier = Modifier

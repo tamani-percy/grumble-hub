@@ -1,5 +1,7 @@
 package com.example.grumblehub.core
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -22,9 +24,11 @@ import androidx.compose.ui.unit.sp
 import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.example.grumblehub.core.datastore.DataStoreManager
 
+@RequiresApi(Build.VERSION_CODES.O)
 @Composable
-fun MainAppScaffold() {
+fun MainAppScaffold(dataStoreManager: DataStoreManager) {
     val navController = rememberNavController()
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestinationRoute = currentBackStackEntry?.destination?.route
@@ -59,7 +63,8 @@ fun MainAppScaffold() {
         AppNavBarGraph(
             modifier = Modifier.padding(contentPadding),
             navController = navController,
-            startDestination = AppNavHost.Home.name
+            startDestination = AppNavHost.Home.name,
+            dataStoreManager = dataStoreManager
         )
     }
 }
