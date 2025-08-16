@@ -1,12 +1,10 @@
-package com.example.grumblehub.core
+package com.example.grumblehub.features.core
 
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.Badge
-import androidx.compose.material3.BadgedBox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
@@ -33,20 +31,15 @@ fun MainAppScaffold(dataStoreManager: DataStoreManager) {
     val currentBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestinationRoute = currentBackStackEntry?.destination?.route
 
-    // Simplified bottom bar visibility logic
     val bottomBarRoutes = remember {
         setOf(
             AppNavHost.Home.name,
-            AppNavHost.Profile.name,
+            AppNavHost.Timeline.name,
             AppNavHost.Search.name
         )
     }
 
     val showBottomBar = currentDestinationRoute in bottomBarRoutes
-
-    val selectedDestination = AppNavBarDestination.Companion.entries.indexOfFirst {
-        it.route == currentDestinationRoute
-    }.takeIf { it >= 0 } ?: 0
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -55,7 +48,6 @@ fun MainAppScaffold(dataStoreManager: DataStoreManager) {
                 OptimizedNavigationBar(
                     navController = navController,
                     currentRoute = currentDestinationRoute,
-                    selectedDestination = selectedDestination
                 )
             }
         }
@@ -73,7 +65,6 @@ fun MainAppScaffold(dataStoreManager: DataStoreManager) {
 private fun OptimizedNavigationBar(
     navController: androidx.navigation.NavHostController,
     currentRoute: String?,
-    selectedDestination: Int
 ) {
     NavigationBar(
         windowInsets = NavigationBarDefaults.windowInsets,
@@ -120,19 +111,11 @@ private fun NavigationIcon(
         label = "iconColor"
     )
 
-    BadgedBox(
-        badge = {
-            if (destination.shouldShowBadge) {
-                Badge { Text("3") }
-            }
-        }
-    ) {
-        Icon(
-            painter = painterResource(destination.iconResId),
-            contentDescription = destination.contentDescription,
-            tint = tint
-        )
-    }
+    Icon(
+        painter = painterResource(destination.iconResId),
+        contentDescription = destination.contentDescription,
+        tint = tint
+    )
 }
 
 @Composable

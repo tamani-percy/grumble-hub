@@ -31,33 +31,36 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.example.grumblehub.core.room.entities.MoodEntity
+import com.example.grumblehub.core.room.entities.TagEntity
 
 @Composable
 fun NewGrievanceDialog(
     moods: List<MoodEntity>,
+    tags: List<TagEntity>,
     onDismissRequest: () -> Unit,
-    onConfirm: (String) -> Unit
+    onConfirm: (String, String, Long, Long) -> Unit
 ) {
     var grievanceText by remember { mutableStateOf("") }
-    var selectedMoodId by remember { mutableStateOf<Int?>(null) }
-    var selectedTagId by remember { mutableStateOf<Int?>(null) }
+    var grievanceTitle by remember { mutableStateOf("") }
+    var selectedMoodId by remember { mutableStateOf<Long?>(null) }
+    var selectedTagId by remember { mutableStateOf<Long?>(null) }
 
     val moodChipItems = remember(moods) {
         moods.map { mood ->
             ChipItem(
-                id = mood.moodId.toInt(),
+                id = mood.moodId,
                 label = mood.name
             )
         }
     }
 
     val tagChipItems = remember {
-        listOf(
-            ChipItem(1, "Work"),
-            ChipItem(2, "Home"),
-            ChipItem(3, "Social"),
-            ChipItem(4, "Relationships"),
-        )
+        tags.map { tag ->
+            ChipItem(
+                id = tag.tagId,
+                label = tag.name
+            )
+        }
     }
 
     Dialog(onDismissRequest = { onDismissRequest() }) {
@@ -76,6 +79,15 @@ fun NewGrievanceDialog(
                 )
 
                 OutlinedTextField(
+                    value = grievanceTitle,
+                    onValueChange = { grievanceTitle = it },
+                    label = { Text("Enter your title") },
+                    textStyle = MaterialTheme.typography.bodyLarge.copy(textAlign = TextAlign.Start),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                OutlinedTextField(
                     value = grievanceText,
                     onValueChange = { grievanceText = it },
                     label = { Text("Enter your grievance") },
@@ -84,6 +96,7 @@ fun NewGrievanceDialog(
                         .fillMaxWidth()
                         .height(150.dp)
                 )
+
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -122,8 +135,18 @@ fun NewGrievanceDialog(
                     }
                     Spacer(modifier = Modifier.width(8.dp))
                     Button(
-                        onClick = { onConfirm(grievanceText) },
-                        enabled = grievanceText.isNotBlank() && selectedMoodId != null && selectedTagId != null,
+                        onClick = {
+                            selectedMoodId?.let {
+                                selectedTagId?.let { it1 ->
+                                    onConfirm(
+                                        grievanceTitle,
+                                        grievanceText,
+                                        it, it1
+                                    )
+                                }
+                            }
+                        },
+                        enabled = grievanceTitle.isNotBlank() && grievanceText.isNotBlank() && selectedMoodId != null && selectedTagId != null,
                     ) {
                         Text("Submit")
                     }

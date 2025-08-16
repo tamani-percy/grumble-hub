@@ -15,13 +15,13 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.example.grumblehub.R
 
-data class ChipItem(val id: Int, val label: String)
+data class ChipItem(val id: Long, val label: String)
 
 @Composable
 fun SingleSelectionChipGroup(
     chips: List<ChipItem>,
-    selectedChipId: Int?, // This is the single source of truth for selection
-    onChipSelected: (Int) -> Unit
+    selectedChipId: Long?, // This is the single source of truth for selection
+    onChipSelected: (Long) -> Unit
 ) {
     FlowRow(
         modifier = Modifier.fillMaxWidth(),

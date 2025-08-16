@@ -12,7 +12,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.compose.GrumbleHubTheme
-import com.example.grumblehub.core.MainAppScaffold
+import com.example.grumblehub.features.core.MainAppScaffold
 import com.example.grumblehub.core.datastore.DataStoreManager
 
 class MainActivity : ComponentActivity() {
